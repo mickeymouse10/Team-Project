@@ -36,18 +36,22 @@ def updateDisplay(state):
 #
 # state -> state
 def updateState(state):
-    return(state[0], state[1], 250 + (125*m.cos((m.pi/2)+((state[7] * m.pi)/180))), 250 + (125*m.sin((m.pi/2)+((state[7] * m.pi)/180))), state[4] + state[6], state[5], state[6], (state[7] + state[8]), state[8])
+    if ((state[0]-15) <= state[4] and state[4] <= (state[0]+15)):
+        return(state[0], state[1], 250 + (125*m.cos((m.pi/2)+((state[7] * m.pi)/180))), 250 + (125*m.sin((m.pi/2)+((state[7] * m.pi)/180))), 0, state[5], 0, (state[7] + state[8]), state[8] + 1)
+    else:
+        return(state[0], state[1], 250 + (125*m.cos((m.pi/2)+((state[7] * m.pi)/180))), 250 + (125*m.sin((m.pi/2)+((state[7] * m.pi)/180))), state[4] + state[6], state[5], state[6], (state[7] + state[8]), state[8])
 
 ################################################################
 
 # state -> bool
 def endState(state):
-    if ((state[0]-15) <= state[4] and state[4] <= (state[0]+15)):
+    if (state[8] == 6):
         return True
     elif ((state[2]-40) <= state[4] and state[4] <= (state[2]+40) and (state[3]-40) <= state[5] and state[5] <= (state[3]+40)):
         return True
     else:
         return False
+
 
 
 ################################################################
@@ -58,7 +62,7 @@ def handleEvent(state, event):
 #    print("Handling event: " + str(event))
     if (event.type == pg.MOUSEBUTTONDOWN):
        if (state[6] == 0):
-           nstate6 = randint(1, 5)
+           nstate6 = 2.25
            return((state[0], state[1], state[2], state[3], state[4], state[5], nstate6, state[7], state[8]))
        else:
            return(state)
@@ -70,7 +74,7 @@ def handleEvent(state, event):
 # World state will be (xearth, yearth, xmoon, ymoon, xast, yast, vast,
 # count, increment)
 
-initState = (250, 250, 250, 125, 0, 250, 0, 0, randint(2,5))
+initState = (250, 250, 250, 125, 0, 250, 0, 0, 3)
 
 # Run the simulation no faster than 60 frames per second
 frameRate = 60
