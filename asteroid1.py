@@ -62,7 +62,7 @@ def handleEvent(state, event):
 #    print("Handling event: " + str(event))
     if (event.type == pg.MOUSEBUTTONDOWN):
        if (state[6] == 0):
-           nstate6 = 2.25
+           nstate6 = (randint(10,15))/5
            return((state[0], state[1], state[2], state[3], state[4], state[5], nstate6, state[7], state[8]))
        else:
            return(state)
