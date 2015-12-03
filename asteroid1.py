@@ -18,14 +18,58 @@ earthimage = dw.loadImage("earth.jpg")
 moonimage = dw.loadImage("moon.jpg")
 astimage = dw.loadImage("asteroid1.jpg")
 
-# state -> image (IO)
 
+# World state will be (xearth, yearth, xmoon, ymoon, xast, yast, vast,
+# count, increment)
+initState = {
+    'xearth': 250,
+    'yearth': 250,
+    'xmoon': 250,
+    'ymoon': 125,
+    'xast': 0,
+    'yast': 250,
+    'vast': 0,
+    'count': 0,
+    'increment': 3,
+    'earth': earthimage,
+    'moon': moonimage,
+    'ast': astimage
+    }
+
+class State():
+    xearth = 250
+    yearth = 250
+    xmoon = 250
+    ymoon = 125
+    xast = 0
+    yast = 250
+    vast = 0
+    count = 0
+    increment = 3
+    def setImage(self,img):
+        self.earth = earthimage
+        self.moon = moonimage
+        self.ast = astimage
+    def moonMove(self):
+        self.count = self.count + self.increment
+        self.xmoon = 250 + (125*m.cos((m.pi/2)+((self.count * m.pi)/180)))
+        self.ymoon = 250 + (125*m.sin((m.pi/2)+((self.count * m.pi)/180)))
+    def astMove(self):
+        self.xast = self.xast + self.vast
+    def __init__(self,img):
+        self.setImage(earthimage)
+        self.setImage(moonimage)
+        self.setImage(astimage)
+        
+InitState = State(initState)
+    
 def updateDisplay(state):
     dw.fill(dw.black)
-    dw.draw(earthimage, (state[0], state[1]))
-    dw.draw(moonimage, (state[2], state[3]))
-    dw.draw(astimage, (state[4], state[5]))
-
+    dw.draw(state.earth, (state.xearth, state.yearth))
+    dw.draw(state.moon, (state.xmoon, state.ymoon))
+    dw.draw(state.ast, (state.xast, state.yast))
+# World state will be (xearth, yearth, xmoon, ymoon, xast, yast, vast,
+# count, increment)v
 
 ################################################################
 
@@ -36,23 +80,27 @@ def updateDisplay(state):
 #
 # state -> state
 def updateState(state):
-    if ((state[0]-15) <= state[4] and state[4] <= (state[0]+15)):
-        return(state[0], state[1], 250 + (125*m.cos((m.pi/2)+((state[7] * m.pi)/180))), 250 + (125*m.sin((m.pi/2)+((state[7] * m.pi)/180))), 0, state[5], 0, (state[7] + state[8]), state[8] + 1)
+    if ((state.xearth-15) <= state.xast and state.xast <= (state.xearth+15)):
+        state.moonMove()
+        state.xast = 0
+        state.vast = 0
+        state.increment = state.increment + 1
+        return state
     else:
-        return(state[0], state[1], 250 + (125*m.cos((m.pi/2)+((state[7] * m.pi)/180))), 250 + (125*m.sin((m.pi/2)+((state[7] * m.pi)/180))), state[4] + state[6], state[5], state[6], (state[7] + state[8]), state[8])
+        state.moonMove()
+        state.astMove()
+        return state
 
 ################################################################
 
 # state -> bool
 def endState(state):
-    if (state[8] == 6):
+    if (state.increment == 6):
         return True
-    elif ((state[2]-40) <= state[4] and state[4] <= (state[2]+40) and (state[3]-40) <= state[5] and state[5] <= (state[3]+40)):
+    elif ((state.xmoon-40) <= state.xast and state.xast <= (state.xmoon+40) and (state.ymoon-40) <= state.yast and state.yast <= (state.ymoon+40)):
         return True
     else:
         return False
-
-
 
 ################################################################
 #
@@ -61,24 +109,19 @@ def endState(state):
 def handleEvent(state, event):  
 #    print("Handling event: " + str(event))
     if (event.type == pg.MOUSEBUTTONDOWN):
-       if (state[6] == 0):
-           nstate6 = (randint(10,15))/5
-           return((state[0], state[1], state[2], state[3], state[4], state[5], nstate6, state[7], state[8]))
-       else:
-           return(state)
-    else:
-        return(state)
+       if (state.vast == 0):
+           state.vast = (randint(10,15))/5
+    return state
 
 ################################################################
 
 # World state will be (xearth, yearth, xmoon, ymoon, xast, yast, vast,
 # count, increment)
 
-initState = (250, 250, 250, 125, 0, 250, 0, 0, 3)
-
 # Run the simulation no faster than 60 frames per second
 frameRate = 60
 
 # Run the simulation!
-rw.runWorld(initState, updateDisplay, updateState, handleEvent,
+rw.runWorld(InitState, updateDisplay, updateState, handleEvent,
             endState, frameRate)
+
